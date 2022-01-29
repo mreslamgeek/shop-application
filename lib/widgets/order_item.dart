@@ -24,7 +24,7 @@ class _OrderItemState extends State<OrderItem> {
       child: Column(
         children: [
           ListTile(
-            title: Text('\$${widget.order.amount}'),
+            title: Text('\$${widget.order.amount.toStringAsFixed(2)}'),
             subtitle: Text(
               DateFormat('dd/MM/yyyy hh:mm').format(widget.order.dateTime),
             ),
@@ -47,24 +47,27 @@ class _OrderItemState extends State<OrderItem> {
                 vertical: 4,
               ),
               height: min(
-                widget.order.products.length * 20.0 + 10,
-                100,
+                widget.order.products.length * 20.0 + 15,
+                150,
               ),
               child: ListView(
                 children: widget.order.products
                     .map(
                       (prod) => Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            prod.title,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: Text(
+                              prod.title,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                           Text(
-                            '${prod.quantity}x \$${prod.price}',
+                            '${prod.quantity}x \$${prod.price.toStringAsFixed(2)}',
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.grey,
