@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../widgets/products_grid.dart';
 import '../widgets/badge.dart';
 import '../providers/cart.dart';
+import '../providers/products_provider.dart';
 import '../screens/cart_screen.dart';
 import '../widgets/app_drawer.dart';
 
@@ -19,6 +20,36 @@ class ProductsOverviewScreen extends StatefulWidget {
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   var _showFavoriteOnly = false;
+  var _isLoading = false;
+  var _isInit = true;
+
+  @override
+  void didChangeDependencies() {
+    //if we need listen to true because context not work in initState
+    //we can use didChangeDependencies()
+    if (_isInit) {
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<ProductsProvider>(context).fetchAndSetProduct().then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
+
+  @override
+  void initState() {
+    //also this way will work becuase it will excute sync code and build the class
+    //then do this to-do fun
+    /*  Future.delayed(Duration.zero).then((_) =>
+        Provider.of<ProductsProvider>(context, listen: false)
+            .fetchAndSetProduct()); */
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +96,12 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
         ],
       ),
       drawer: AppDrawer(),
-      body: ProductsGrid(_showFavoriteOnly),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(
+              color: Theme.of(context).accentColor,
+            ))
+          : ProductsGrid(_showFavoriteOnly),
     );
   }
 }
