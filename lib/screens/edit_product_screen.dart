@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -121,6 +119,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
       setState(() {
         _isLoading = false;
       });
+      Navigator.of(context).pop();
     } else {
       try {
         await Provider.of<ProductsProvider>(context, listen: false)
