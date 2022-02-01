@@ -157,9 +157,20 @@ class ProductsProvider with ChangeNotifier {
 
   Product findById(String id) => _items.firstWhere((prod) => prod.id == id);
 
-  void updateProduct(String id, Product newValue) {
+  Future<void> updateProduct(String id, Product newValue) async {
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     if (prodIndex >= 0) {
+      final url = Uri.https(
+        'shop-app-project-id-default-rtdb.firebaseio.com',
+        '/products/$id.json',
+      );
+      await http.patch(url,
+          body: json.encode({
+            'title': newValue.title,
+            'description': newValue.description,
+            'price': newValue.price,
+            'imageUrl': newValue.imageUrl,
+          }));
       _items[prodIndex] = newValue;
       notifyListeners();
     } else {
@@ -167,7 +178,12 @@ class ProductsProvider with ChangeNotifier {
     }
   }
 
-  void removeProduct(String id) {
+  void removeProduct(String id) async {
+    final url = Uri.https(
+      'shop-app-project-id-default-rtdb.firebaseio.com',
+      '/products/$id.json',
+    );
+    await http.delete(url);
     _items.removeWhere((prod) => prod.id == id);
     notifyListeners();
 
