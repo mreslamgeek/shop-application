@@ -163,7 +163,7 @@ class ProductsProvider with ChangeNotifier {
     if (prodIndex >= 0) {
       final url = Uri.https(
         'shop-app-project-id-default-rtdb.firebaseio.com',
-        '/products/$id.',
+        '/products/$id.json',
       );
       await http.patch(url,
           body: json.encode({
