@@ -11,12 +11,14 @@ class UserProductsScreen extends StatelessWidget {
 
   Future<void> _refreshProducts(BuildContext context) async {
     await Provider.of<ProductsProvider>(context, listen: false)
-        .fetchAndSetProduct();
+        .fetchAndSetProduct(true);
   }
 
   @override
   Widget build(BuildContext context) {
-    final productsData = Provider.of<ProductsProvider>(context);
+    //with using future builde no will go in infinte loop
+    // FutureBuilder >>_refreshProducts >> update products >> rebuild intire app >> FutureBuilder again
+    //final productsData = Provider.of<ProductsProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Products'),
@@ -30,24 +32,36 @@ class UserProductsScreen extends StatelessWidget {
         ],
       ),
       drawer: AppDrawer(),
-      body: RefreshIndicator(
-        onRefresh: () => _refreshProducts(context),
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: ListView.builder(
-            itemCount: productsData.items.length,
-            itemBuilder: (_, i) => Column(
-              children: [
-                UserProductItem(
-                  productsData.items[i].id,
-                  productsData.items[i].title,
-                  productsData.items[i].imageUrl,
-                ),
-                Divider()
-              ],
-            ),
-          ),
-        ),
+      body: FutureBuilder(
+        future: _refreshProducts(context),
+        builder: (context, snapshot) =>
+            snapshot.connectionState == ConnectionState.waiting
+                ? Center(
+                    child: CircularProgressIndicator(
+                      color: Theme.of(context).accentColor,
+                    ),
+                  )
+                : RefreshIndicator(
+                    onRefresh: () => _refreshProducts(context),
+                    child: Consumer<ProductsProvider>(
+                      builder: (ctx, productsData, _) => Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: ListView.builder(
+                          itemCount: productsData.items.length,
+                          itemBuilder: (_, i) => Column(
+                            children: [
+                              UserProductItem(
+                                productsData.items[i].id,
+                                productsData.items[i].title,
+                                productsData.items[i].imageUrl,
+                              ),
+                              Divider()
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
       ),
     );
   }
