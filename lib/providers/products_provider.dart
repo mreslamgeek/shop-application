@@ -42,6 +42,10 @@ class ProductsProvider with ChangeNotifier {
   ];
 
   // var _showFavoriteOnly = false;
+  final String authToken;
+  final String userId;
+
+  ProductsProvider(this.authToken, this.userId, this._items);
 
   List<Product> get items {
     // if (_showFavoriteOnly) {
@@ -65,8 +69,13 @@ class ProductsProvider with ChangeNotifier {
   // }
 
   Future<void> fetchAndSetProduct() async {
-    final url = Uri.https(
-        'shop-app-project-id-default-rtdb.firebaseio.com', '/products.json');
+    var url = Uri.https(
+      'shop-app-project-id-default-rtdb.firebaseio.com',
+      '/products.json',
+      {
+        'auth': authToken,
+      },
+    );
 
     try {
       final response = await http.get(url);
@@ -74,6 +83,14 @@ class ProductsProvider with ChangeNotifier {
       if (extractedData == null) {
         return;
       }
+      url = Uri.https(
+        'shop-app-project-id-default-rtdb.firebaseio.com',
+        '/userFavorites/$userId.json',
+        {'auth': authToken},
+      );
+      final favoriteResponse = await http.get(url);
+      final favoriteData = json.decode(favoriteResponse.body);
+
       final List<Product> loadedProducts = [];
       extractedData.forEach((prodId, prodData) {
         loadedProducts.add(Product(
@@ -82,7 +99,8 @@ class ProductsProvider with ChangeNotifier {
           description: prodData['description'],
           price: prodData['price'],
           imageUrl: prodData['imageUrl'],
-          isFavorite: prodData['isFavorite'],
+          isFavorite:
+              favoriteData == null ? false : favoriteData[prodId] ?? false,
         ));
       });
 
@@ -97,6 +115,9 @@ class ProductsProvider with ChangeNotifier {
     final url = Uri.https(
       'shop-app-project-id-default-rtdb.firebaseio.com',
       '/products.json',
+      {
+        'auth': authToken,
+      },
     );
 
     try {
@@ -107,7 +128,6 @@ class ProductsProvider with ChangeNotifier {
           'description': product.description,
           'price': product.price,
           'imageUrl': product.imageUrl,
-          'isFavorite': product.isFavorite,
         }),
       );
 
@@ -167,6 +187,9 @@ class ProductsProvider with ChangeNotifier {
       final url = Uri.https(
         'shop-app-project-id-default-rtdb.firebaseio.com',
         '/products/$id.json',
+        {
+          'auth': authToken,
+        },
       );
       await http.patch(url,
           body: json.encode({
@@ -186,6 +209,9 @@ class ProductsProvider with ChangeNotifier {
     final url = Uri.https(
       'shop-app-project-id-default-rtdb.firebaseio.com',
       '/products/$id.json',
+      {
+        'auth': authToken,
+      },
     );
     final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
     var existingProduct = _items[existingProductIndex];

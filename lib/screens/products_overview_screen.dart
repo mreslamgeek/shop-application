@@ -14,6 +14,7 @@ enum FiliterOptions {
 }
 
 class ProductsOverviewScreen extends StatefulWidget {
+  static String routeName = '/product-overview';
   @override
   State<ProductsOverviewScreen> createState() => _ProductsOverviewScreenState();
 }
