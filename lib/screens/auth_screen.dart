@@ -176,6 +176,16 @@ class _AuthCardState extends State<AuthCard> {
           'Could not authenticate you, Please try again later.';
       _showErrorDialog(errorMessage);
     }
+
+    /*
+    This error happens if you call setState() on a State object for a widget that 
+    no longer appears in the widget tree (e.g., whose parent widget no longer includes 
+    the widget in its build). This error can occur when code calls setState() from a 
+    timer or an animation callback.
+     */
+    if (!mounted) {
+      return;
+    }
     setState(() {
       _isLoading = false;
     });
