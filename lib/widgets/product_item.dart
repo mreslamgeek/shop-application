@@ -47,12 +47,19 @@ class ProductItem extends StatelessWidget {
             );
           },
           child: Hero(
-            tag: 'image-${product.id}',
-            child: Image.network(
-              product.imageUrl,
-              fit: BoxFit.cover,
-            ),
-          ),
+              tag: 'image-${product.id}',
+              child: FadeInImage(
+                placeholder: AssetImage('assets/images/product-bag.png'),
+                image: NetworkImage(
+                  product.imageUrl,
+                ),
+                fit: BoxFit.cover,
+              )
+// Image.network(
+//               product.imageUrl,
+//               fit: BoxFit.cover,
+//             ),
+              ),
         ),
         footer: GridTileBar(
           backgroundColor: Colors.black87,
